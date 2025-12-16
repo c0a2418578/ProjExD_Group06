@@ -30,7 +30,7 @@ def main():
         pygame.quit()
         sys.exit()
 
-    
+
     # --- タイル選択の固定設定 (48x48タイル用) ---
     # TS0 = tileset1.png, TS1 = tileset2.png (あれば)
     # インデックス計算: tile_idx = y * (横のタイル数) + x 
@@ -52,9 +52,15 @@ def main():
     # --- 固定設定ここまで ---
     
     map_gen.generate()
-    
-    camera_x = 0
-    camera_y = 0
+    # プレイヤー生成
+    from move import Player
+    player = Player(
+        map_gen.rooms[0].centerx,
+        map_gen.rooms[0].centery,
+        tile_size=48
+    )
+    # camera_x = 0
+    # camera_y = 0
     camera_speed = 10 
     
     running = True
@@ -65,31 +71,41 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     map_gen.generate()
-                    camera_x = 0
-                    camera_y = 0
+                    # プレイヤーを新しいマップの最初の部屋に配置
+                    player.tile_x = map_gen.rooms[0].centerx
+                    player.tile_y = map_gen.rooms[0].centery
         
-        # カメラ移動 (矢印キー)
+        # # カメラ移動 (矢印キー)
+        # keys = pygame.key.get_pressed()
+        # if keys[pygame.K_LEFT]:
+        #     camera_x -= camera_speed
+        # if keys[pygame.K_RIGHT]:
+        #     camera_x += camera_speed
+        # if keys[pygame.K_UP]:
+        #     camera_y -= camera_speed
+        # if keys[pygame.K_DOWN]:
+        #     camera_y += camera_speed
+        # プレイヤー移動（WASDキー）
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            camera_x -= camera_speed
-        if keys[pygame.K_RIGHT]:
-            camera_x += camera_speed
-        if keys[pygame.K_UP]:
-            camera_y -= camera_speed
-        if keys[pygame.K_DOWN]:
-            camera_y += camera_speed
+        player.handle_input(keys, map_gen)
+        
+        # カメラをプレイヤーに追従
+        camera_x, camera_y = player.get_camera_pos(
+            800, 600,
+            map_gen.width * map_gen.tile_size,
+            map_gen.height * map_gen.tile_size
+        )
         
         # カメラ位置の制限
-        max_camera_x = max(0, map_gen.width * map_gen.tile_size - screen.get_width())
-        max_camera_y = max(0, map_gen.height * map_gen.tile_size - screen.get_height())
+        # max_camera_x = max(0, map_gen.width * map_gen.tile_size - screen.get_width())
+        # max_camera_y = max(0, map_gen.height * map_gen.tile_size - screen.get_height())
         
-        camera_x = max(0, min(camera_x, max_camera_x))
-        camera_y = max(0, min(camera_y, max_camera_y))
-        
+        # camera_x = max(0, min(camera_x, max_camera_x))
+        # camera_y = max(0, min(camera_y, max_camera_y))
         # 描画
         screen.fill((0, 0, 0))
         map_gen.draw(screen, camera_x, camera_y)
-        
+        player.draw(screen, camera_x, camera_y)
         # UI表示
         font = pygame.font.Font(None, 24)
         text1 = font.render("SPACE: Regenerate | Arrows: Move", True, (255, 255, 255))
