@@ -6,7 +6,8 @@ if TYPE_CHECKING:
 
 
 class Player:
-    def __init__(self, x: int, y: int, tile_size: int = 16):
+    def __init__(self, x: int, y: int, tile_size: int = 48):
+        super().__init__()
         """
         プレイヤークラス
         
