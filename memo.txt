@@ -1,0 +1,55 @@
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption("Random Map Generator")
+    clock = pygame.time.Clock()
+    
+    # マップジェネレーターの初期化
+    map_gen = MapGenerator(width=100, height=100, tile_size=16)
+    map_gen.generate()
+    
+    # プレイヤー生成
+    from move import Player
+    player = Player(
+        map_gen.rooms[0].centerx,
+        map_gen.rooms[0].centery,
+        tile_size=16
+    )
+    
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    map_gen.generate()
+                    # プレイヤーを新しいマップの最初の部屋に配置
+                    player.tile_x = map_gen.rooms[0].centerx
+                    player.tile_y = map_gen.rooms[0].centery
+        
+        # プレイヤー移動（WASDキー）
+        keys = pygame.key.get_pressed()
+        player.handle_input(keys, map_gen)
+        
+        # カメラをプレイヤーに追従
+        camera_x, camera_y = player.get_camera_pos(
+            800, 600,
+            map_gen.width * map_gen.tile_size,
+            map_gen.height * map_gen.tile_size
+        )
+        
+        # 描画
+        screen.fill((0, 0, 0))
+        map_gen.draw(screen, camera_x, camera_y)
+        player.draw(screen, camera_x, camera_y)
+        
+        # UI表示
+        font = pygame.font.Font(None, 36)
+        text = font.render("WASD: Move | SPACE: Regenerate", True, (255, 255, 255))
+        screen.blit(text, (10, 10))
+        
+        pygame.display.flip()
+        clock.tick(60)
+    
+    pygame.quit()
