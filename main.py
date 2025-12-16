@@ -2,10 +2,14 @@
 import pygame
 import os
 import sys
+import random
+from typing import List, Tuple
 
 # パッケージ内のクラスをインポート
 # main.pyと同じディレクトリにmap_engineがあることを想定
 from map_engine.map_generator import MapGenerator
+
+from enemy import Enemy
 
 # MapGenerator内で定義されているデフォルトサイズを取得
 DEFAULT_TILE_SIZE = 48 
@@ -53,6 +57,16 @@ def main():
     
     map_gen.generate()
     
+    enemies: List[Enemy] = []
+    for room in map_gen.rooms:
+        # 部屋内のタイル座標をランダムに選び、ピクセル座標に変換
+        tx = random.randint(max(room.left + 1, 0), max(room.right - 2, room.left))
+        ty = random.randint(max(room.top + 1, 0), max(room.bottom - 2, room.top))
+        ex = tx * map_gen.tile_size
+        ey = ty * map_gen.tile_size
+        # 敵画像は未指定（フォールバック描画）。速度は適度に設定
+        enemies.append(Enemy(ex, ey, hp=20, speed=40.0, image_path="Assets/enemy_kyuri.png", tile_size=map_gen.tile_size))
+    
     camera_x = 0
     camera_y = 0
     camera_speed = 10 
@@ -89,6 +103,9 @@ def main():
         # 描画
         screen.fill((0, 0, 0))
         map_gen.draw(screen, camera_x, camera_y)
+
+        for e in enemies:
+            e.draw(screen, camera_x, camera_y)
         
         # UI表示
         font = pygame.font.Font(None, 24)
