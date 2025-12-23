@@ -42,6 +42,7 @@ class Player:
             self.image_left = None
             self.current_image = None
     
+    
     def get_pixel_pos(self):
         """ピクセル座標を取得"""
         return self.tile_x * self.tile_size, self.tile_y * self.tile_size
