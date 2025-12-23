@@ -46,6 +46,17 @@ class Player:
         """ピクセル座標を取得"""
         return self.tile_x * self.tile_size, self.tile_y * self.tile_size
     
+
+    def get_rect(self) -> pygame.Rect:
+        """プレイヤーの矩形を取得"""
+        return pygame.Rect(
+            self.tile_x * self.tile_size,
+            self.tile_y * self.tile_size,
+            self.tile_size,
+            self.tile_size
+        )
+
+
     def can_move_to(self, x: int, y: int, map_gen: 'MapGenerator') -> bool:
         """
         指定された座標に移動可能かチェック
