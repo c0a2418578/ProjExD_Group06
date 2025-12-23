@@ -20,7 +20,7 @@ class Player:
         self.tile_y = y
         self.tile_size = tile_size
         self.speed = tile_size  # 1タイル分の移動速度
-        
+        moved = False
         # 向き（0: 右, 1: 左）
         self.direction = 0
         
@@ -103,21 +103,36 @@ class Player:
             keys: pygame.key.get_pressed()の結果
             map_gen: マップジェネレーター
         """
-        moved = False
-        
-        if keys[pygame.K_w] and not moved:
-            self.move(0, -1, map_gen)
-            moved = True
-        if keys[pygame.K_s] and not moved:
-            self.move(0, 1, map_gen)
-            moved = True
-        if keys[pygame.K_a] and not moved:
-            self.move(-1, 0, map_gen)
-            moved = True
-        if keys[pygame.K_d] and not moved:
-            self.move(1, 0, map_gen)
-            moved = True
-    
+        global moved
+        moved2 = False
+        if (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_a] or keys[pygame.K_d]) == False:
+            moved = False  # 移動キーを押していない場合
+        if keys[pygame.K_LSHIFT]:  # Shiftキーを押している場合は速度を上げる[_shift]
+            if keys[pygame.K_w] and not moved2:
+                self.move(0, -1, map_gen)
+                moved2 = True
+            if keys[pygame.K_s] and not moved2:
+                self.move(0, 1, map_gen)
+                moved2 = True
+            if keys[pygame.K_a] and not moved2:
+                self.move(-1, 0, map_gen)
+                moved2 = True
+            if keys[pygame.K_d] and not moved2:
+                self.move(1, 0, map_gen)
+                moved2 = True
+        if keys[pygame.K_LSHIFT] == False:  # Shiftキーを押していない時
+            if keys[pygame.K_w] and not moved:
+                self.move(0, -1, map_gen)
+                moved = True
+            if keys[pygame.K_s] and not moved:
+                self.move(0, 1, map_gen)
+                moved = True
+            if keys[pygame.K_a] and not moved:
+                self.move(-1, 0, map_gen)
+                moved = True
+            if keys[pygame.K_d] and not moved:
+                self.move(1, 0, map_gen)
+                moved = True
     def get_camera_pos(self, screen_width: int, screen_height: int, map_width: int, map_height: int):
         """
         プレイヤーを中心にしたカメラ位置を計算
